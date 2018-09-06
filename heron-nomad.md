@@ -51,14 +51,16 @@ heron kill local test
 
 # Démo 3 : Heron dans Nomad
 
+docker rm -f zookeeper
+docker run -tid --rm --net host --name zookeeper zookeeper
 cat > ~/.heron/conf/nomad/uploader.yaml << 'EOF'
 # uploader class for transferring the topology jar/tar files to storage
 heron.class.uploader:    com.twitter.heron.uploader.http.HttpUploader
 heron.uploader.http.uri: http://localhost:9000/api/v1/file/upload
 EOF
 heron-apiserver --cluster nomad --base-template nomad --download-hostname 127.0.0.1 --heron-core-package-path ~/.heron/dist/heron-core.tar.gz -D heron.statemgr.connection.string=127.0.0.1:2181 -D heron.nomad.scheduler.uri=127.0.0.1:4647 -D heron.class.uploader=com.twitter.heron.uploader.http.HttpUploader --verbose
-sed -i "s/#\(heron.package.core.*http://.*\)/\1/" ~/.heron/conf/nomad/client.yaml
-sed -i "s/\(heron.package.core.*file://.*\)/#\1/" ~/.heron/conf/nomad/client.yaml
+sed -i "s/#\(heron.package.core.*http:\/\/.*\)/\1/" ~/.heron/conf/nomad/client.yaml
+sed -i "s/\(heron.package.core.*file:\/\/.*\)/#\1/" ~/.heron/conf/nomad/client.yaml
 
 
 # Démo 4 : Heron standalone (embedded Nomad)
